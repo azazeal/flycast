@@ -1,0 +1,36 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>.: {{ .AppName }} :.</title>
+		<style>
+			* {
+				font-family: monospace;
+				color: rgb(201, 209, 217);
+			}
+
+			body {
+				background-color: rgb(13,17,23);
+				margin-left: 15%;
+				margin-right: 15%;
+			}
+
+			.error {
+				color: #660000
+			}
+		</style>
+	</head>
+	<body>
+		<h2>{{ .AppName }}</h2>
+		<p>hi there, this is {{ .AppName }} running on <b>{{ .Region }}</b>.</p>		
+		{{ if .Failures }}
+			<p>some of my components are currently <b class="error">failing</b>:</p>
+			<ul>
+			{{ range .Failures }}
+				<li><b class="error">{{ . }}</b></li>
+			{{ end }}
+			</ul>
+		{{ end }}
+	</body>
+</html>

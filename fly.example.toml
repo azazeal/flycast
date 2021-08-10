@@ -1,0 +1,19 @@
+app = "flycast"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[env]
+APP = "some-other-app-on-fly"
+
+[[services.ports]]
+handlers = ["tls", "http"]
+port = "443"
+
+[[services.http_checks]]
+grace_period = "5s"
+interval = 5000
+method = "get"
+path = "/health"
+protocol = "http"
+timeout = 2000
