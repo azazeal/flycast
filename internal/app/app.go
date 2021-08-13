@@ -4,6 +4,7 @@ package app
 import (
 	"context"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	golog "log"
@@ -35,9 +36,7 @@ func Serve(ctx context.Context, wg *sync.WaitGroup) {
 		hc     = health.FromContext(ctx)
 	)
 
-	mux := http.NewServeMux()
-	mux.Handle("/health", health.FromContext(ctx))
-	mux.HandleFunc("/", index)
+	mux := newMux(ctx)
 
 	go func() {
 		defer wg.Done()
@@ -56,7 +55,7 @@ func Serve(ctx context.Context, wg *sync.WaitGroup) {
 	}()
 }
 
-func serve(ctx context.Context, logger *zap.Logger, l net.Listener, h http.Handler) {
+func serve(parent context.Context, logger *zap.Logger, l net.Listener, h http.Handler) {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 
@@ -68,7 +67,11 @@ func serve(ctx context.Context, logger *zap.Logger, l net.Listener, h http.Handl
 		IdleTimeout:       time.Minute,
 		MaxHeaderBytes:    4 << 10,
 		ErrorLog:          newErrorLogger(logger),
-		ConnContext: func(parent context.Context, conn net.Conn) context.Context {
+		ConnContext: func(ctx context.Context, conn net.Conn) context.Context {
+			ctx = health.NewContext(ctx, health.FromContext(parent))
+			ctx = config.NewContext(ctx, config.FromContext(parent))
+			ctx = log.NewContext(ctx, log.FromContext(parent))
+
 			return ctx
 		},
 	}
@@ -78,7 +81,7 @@ func serve(ctx context.Context, logger *zap.Logger, l net.Listener, h http.Handl
 		defer wg.Done()
 
 		select {
-		case <-ctx.Done():
+		case <-parent.Done():
 			ctx, cancel := context.WithTimeout(context.TODO(), time.Minute>>1)
 			defer cancel()
 
@@ -138,24 +141,93 @@ type indexViewData struct {
 	Failures []string
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
-	switch {
-	default:
-		hc := health.FromContext(r.Context())
+func broadcast(w http.ResponseWriter, r *http.Request) {
+	logger := log.FromContext(r.Context())
 
-		failures := hc.Failing(nil)
-		sort.Strings(failures)
-
-		indexTemplate.Execute(w, indexViewData{
-			AppName:  common.AppName,
-			Region:   env.Region(),
-			Failures: failures,
-		})
-	case r.Method != http.MethodGet:
-		respondWith(w, http.StatusMethodNotAllowed)
-	case r.URL.Path != "/":
-		respondWith(w, http.StatusNotFound)
+	var wrapper struct {
+		Globally bool   `json:"globally"`
+		Body     []byte `json:"data"`
 	}
+	if err := json.NewDecoder(r.Body).Decode(&wrapper); err != nil {
+		logger.Warn("failed decoding message.",
+			zap.Error(err))
+
+		respondWith(w, http.StatusUnprocessableEntity)
+
+		return
+	}
+
+	logger = logger.
+		With(log.Data(wrapper.Body)).
+		With(zap.Bool("globally", wrapper.Globally))
+
+	// TODO: implement
+
+	respondWith(w, http.StatusNoContent)
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	hc := health.FromContext(r.Context())
+
+	failures := hc.Failing(nil)
+	sort.Strings(failures)
+
+	indexTemplate.Execute(w, indexViewData{
+		AppName:  common.AppName,
+		Region:   env.Region(),
+		Failures: failures,
+	})
+}
+
+func newMux(ctx context.Context) (mux *http.ServeMux) {
+	mux = http.NewServeMux()
+
+	match := func(path string, h http.Handler, methods ...string) {
+		mux.Handle(path, restrict(h, path, methods...))
+	}
+
+	matchFunc := func(path string, fn http.HandlerFunc, methods ...string) {
+		match(path, fn, methods...)
+	}
+
+	hc := health.FromContext(ctx)
+	match("/health", hc, http.MethodGet, http.MethodHead)
+
+	matchFunc("/broadcast", broadcast, http.MethodPost)
+	matchFunc("/", index, http.MethodGet)
+
+	return
+}
+
+func matchFunc(m *http.ServeMux, fn http.HandlerFunc, path string, methods ...string) {
+	m.Handle(path, restrict(fn, path, methods...))
+}
+
+func match(m *http.ServeMux, h http.Handler, path string, methods ...string) {
+	m.Handle(path, restrict(h, path, methods...))
+}
+
+func restrict(h http.Handler, path string, methods ...string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case !matchMethod(r.Method, methods...):
+			respondWith(w, http.StatusMethodNotAllowed)
+		case r.URL.Path != path:
+			respondWith(w, http.StatusNotFound)
+		default:
+			h.ServeHTTP(w, r)
+		}
+	})
+}
+
+func matchMethod(method string, allowed ...string) bool {
+	for _, a := range allowed {
+		if method == a {
+			return true
+		}
+	}
+
+	return false
 }
 
 func respondWith(w http.ResponseWriter, code int) {
