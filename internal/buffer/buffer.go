@@ -3,7 +3,7 @@ package buffer
 import "sync"
 
 // Len denotes the len of all buffers.
-const Len = 1 << 15
+const Len = 1 << 14
 
 // Dup returns a buffer which contains a copy of msg.
 //
