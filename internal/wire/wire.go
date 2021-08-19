@@ -41,14 +41,13 @@ func Broadcast(ctx context.Context, wg *sync.WaitGroup, pl *peer.List, global bo
 		defer wg.Done()
 
 		loop.Func(ctx, time.Second, func(ctx context.Context) {
-			defer hc.Unset(hcc)
+			defer hc.Fail(hcc)
 
 			conn := bind(logger, bindPort(cfg, global))
 			if conn == nil {
 				return
 			}
-
-			hc.Set(hcc)
+			hc.Pass(hcc)
 
 			run(ctx, &broadcaster{
 				logger: logger,

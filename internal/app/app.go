@@ -42,10 +42,10 @@ func Serve(ctx context.Context, wg *sync.WaitGroup) {
 		defer wg.Done()
 
 		loop.Func(ctx, time.Second, func(ctx context.Context) {
-			defer hc.Unset(common.HCAppComponent)
+			defer hc.Fail(common.HCAppComponent)
 
 			if l := bind(logger, addr); l != nil {
-				hc.Set(common.HCAppComponent)
+				hc.Pass(common.HCAppComponent)
 
 				serve(ctx, logger, l, mux)
 			}
