@@ -2,8 +2,8 @@ github.com/azazeal/exit v0.0.0-20210316143728-f8159cc321b4 h1:65o7A73N6Oa9ufQ7CO
 github.com/azazeal/exit v0.0.0-20210316143728-f8159cc321b4/go.mod h1:oU++8oGg299SXo46/JHNeBm9Vx4hS7Ai2Lm4FxZfcGo=
 github.com/azazeal/fly v0.0.12 h1:lhTiSL2G2eafPgZTgllj02Hgx+owzv2drHpE0RdHfWo=
 github.com/azazeal/fly v0.0.12/go.mod h1:q7OhxxIp/q+Dh5pJWybIHmVgVgOytLhhZmVEqGXzd3Y=
-github.com/azazeal/health v1.2.0 h1:ukP3OfHhxwQ24nsFauMwk/78Mt51pp+cSmdNq+HDpgQ=
-github.com/azazeal/health v1.2.0/go.mod h1:fK5s18cc37c58xkYgeXRcjzRZptGg8AJxmT1hy2VFdM=
+github.com/azazeal/health v1.3.0 h1:WhzVPAOxKI/UmVgjpOXMU1nB8kEi56qKOjtgSY6TSLc=
+github.com/azazeal/health v1.3.0/go.mod h1:fK5s18cc37c58xkYgeXRcjzRZptGg8AJxmT1hy2VFdM=
 github.com/azazeal/pause v1.0.0 h1:gh7GhJQ+KjYZXUig3xyc8KaZoqqGZTxK3gV9rbvRzU8=
 github.com/azazeal/pause v1.0.0/go.mod h1:kLXh4F/4iaRI75opg9+3/00P3xFInZXc7TDed9cEDZE=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=

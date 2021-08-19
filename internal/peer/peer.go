@@ -84,11 +84,11 @@ func (l *List) refresh(ctx context.Context) {
 
 	ips, ok := l.resolve(ctx)
 	if !ok {
-		l.hc.Unset(l.hcc)
+		l.hc.Fail(l.hcc)
 
 		return
 	}
-	l.hc.Set(l.hcc)
+	l.hc.Pass(l.hcc)
 
 	var new peerSet
 	if len(ips) > 0 {
