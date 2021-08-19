@@ -5,10 +5,23 @@
 
 `flycast` implements persevering UDP broadcasting for apps running on [Fly](http://fly.io).
 
+It does so by accepting UDP packets on two configurable port numbers and by
+_re-sending_ those packets to global or regional (depending on the intercepting
+port) instances of a configurable target app via the organization's internal
+network.
+
+`flycast` discovers the instances it should broadcast to automatically, via 
+querying Fly's internal DNS, and very frequently (currently every second) and 
+comes with an embedded HTTP server that exports a complete health check.
+
+An example deployment configuration can be found in the 
+[`fly.example.toml`](https://github.com/azazeal/flycast/blob/master/fly.example.toml)
+file of this repo.
+
 ## Disclaimer
 
-- This here app works not yet, maybe possibly.
-- 32768 bytes, or 32 KiB, is the maximum UDP packet size `flycast` can handle.
+- This here program works not, maybe possibly, yet.
+- 16384 bytes, or 16 KiB, is the maximum UDP packet size `flycast` can handle.
 
 ## Configuration
 
