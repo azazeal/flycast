@@ -45,7 +45,7 @@ func run() (err error) {
 
 	// start broadcasting locally
 	wg.Add(2)
-	local := peer.Refresh(ctx, &wg, true)
+	local := peer.Refresh(ctx, &wg, false)
 	wire.Broadcast(ctx, &wg, local, false)
 
 	return
