@@ -142,7 +142,7 @@ func shutdown(b *broadcaster) {
 func (b *broadcaster) read() ([]byte, error) {
 	logger := b.logger
 
-	n, addr, err := b.conn.ReadFrom(b.buf[:buffer.Len:buffer.Len])
+	n, addr, err := b.conn.ReadFrom(b.buf[:buffer.Size:buffer.Size])
 	if n > 0 {
 		logger = logger.With(log.Data(b.buf[:n]))
 	}

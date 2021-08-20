@@ -2,15 +2,15 @@ package buffer
 
 import "sync"
 
-// Len denotes the len of all buffers.
-const Len = 1 << 14
+// Size denotes the size of all buffers.
+const Size = 1 << 14
 
 // Dup returns a buffer which contains a copy of msg.
 //
 // the buffer may be released to the pool.
 func Dup(msg []byte) (buf []byte) {
 	buf = Get()
-	copy(buf[:len(msg):Len], msg)
+	copy(buf[:len(msg):Size], msg)
 
 	return
 }
@@ -22,11 +22,11 @@ func Get() []byte {
 
 // Put releases the buffer
 func Put(b []byte) {
-	pool.Put(b[:Len:Len])
+	pool.Put(b[:Size:Size])
 }
 
 var pool = sync.Pool{
 	New: func() interface{} {
-		return make([]byte, Len, Len)
+		return make([]byte, Size, Size)
 	},
 }
