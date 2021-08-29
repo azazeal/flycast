@@ -54,20 +54,18 @@ func (cfg *Config) Fields() []zap.Field {
 	}
 }
 
-type contextKeyType int
-
-const contextKey contextKeyType = iota + 1
+type contextKeyType struct{}
 
 // FromContext returns the Config the given Context carries.
 //
 // FromContext panics in case the given Context carries no Config.
 func FromContext(ctx context.Context) *Config {
-	return ctx.Value(contextKey).(*Config)
+	return ctx.Value(contextKeyType{}).(*Config)
 }
 
 // NewContext returns a copy of ctx which carries cfg.
 func NewContext(ctx context.Context, cfg *Config) context.Context {
-	return context.WithValue(ctx, contextKey, cfg)
+	return context.WithValue(ctx, contextKeyType{}, cfg)
 }
 
 const (
