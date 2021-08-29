@@ -88,7 +88,7 @@ func Load(logger *zap.Logger) (*Config, error) {
 	logger = logger.Named(pkg)
 	logger.Info("loading configuration ...")
 
-	if env.IsSet() {
+	if !env.IsSet() {
 		logger.Error("not running on fly.")
 
 		return nil, errNotOnFly
