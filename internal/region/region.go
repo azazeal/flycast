@@ -1,7 +1,8 @@
 package region
 
 import (
-	"github.com/azazeal/fly/pkg/env"
+	"github.com/azazeal/fly/env"
+
 	"github.com/azazeal/flycast/internal/common"
 )
 

@@ -6,10 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/azazeal/fly/pkg/dns"
+	"github.com/azazeal/fly/dns"
 	"github.com/azazeal/health"
+	"go.uber.org/zap"
 
 	"github.com/azazeal/flycast/internal/buffer"
 	"github.com/azazeal/flycast/internal/config"

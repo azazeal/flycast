@@ -1,7 +1,7 @@
 github.com/azazeal/exit v0.1.2 h1:mSD3hll/wOS3GpW+KyreF7AFToL4VH0vbkZwTvyXOqg=
 github.com/azazeal/exit v0.1.2/go.mod h1:bWwxEVjRjCWKdVTKU3YOQKwHOC+wZRXNceefs6yfoGg=
-github.com/azazeal/fly v0.0.19 h1:CVHi2Q6+F1+C8gAnRAk020p/oks6DDAns5pKL79Ey9g=
-github.com/azazeal/fly v0.0.19/go.mod h1:q7OhxxIp/q+Dh5pJWybIHmVgVgOytLhhZmVEqGXzd3Y=
+github.com/azazeal/fly v0.1.0 h1:ASxuFvLKhKRfbiAOsjmb/ZniUYNdhX3gDf3ns+5qS+w=
+github.com/azazeal/fly v0.1.0/go.mod h1:q7OhxxIp/q+Dh5pJWybIHmVgVgOytLhhZmVEqGXzd3Y=
 github.com/azazeal/health v1.3.2 h1:I1BMlxuJi5YA55I6VkeeIMoWI9wF2W7EPh7RZytkoh0=
 github.com/azazeal/health v1.3.2/go.mod h1:fK5s18cc37c58xkYgeXRcjzRZptGg8AJxmT1hy2VFdM=
 github.com/azazeal/pause v1.0.0 h1:gh7GhJQ+KjYZXUig3xyc8KaZoqqGZTxK3gV9rbvRzU8=

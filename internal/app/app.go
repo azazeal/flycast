@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/azazeal/fly/pkg/env"
+	"github.com/azazeal/fly/env"
 	"github.com/azazeal/health"
 	"github.com/azazeal/pause"
 	"go.uber.org/zap"

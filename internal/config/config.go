@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/azazeal/exit"
-	"github.com/azazeal/fly/pkg/env"
+	"github.com/azazeal/fly/env"
 	"go.uber.org/zap"
 
 	"github.com/azazeal/flycast/internal/common"
