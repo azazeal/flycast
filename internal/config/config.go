@@ -3,7 +3,6 @@ package config
 
 import (
 	"context"
-	"errors"
 	"math"
 	"os"
 	"strconv"
@@ -68,20 +67,20 @@ func NewContext(ctx context.Context, cfg *Config) context.Context {
 	return context.WithValue(ctx, contextKeyType{}, cfg)
 }
 
-const (
-	pkg         = "config"
-	errorPrefix = common.AppName + "/" + pkg + ": "
-)
+const pkg = "config"
 
 var (
-	errSetDefaults = exit.Wrap(common.ECSetEnvDefaults,
-		errors.New(errorPrefix+"failed setting environment defaults"))
+	errSetDefaults = exit.Wrapf(common.ECSetEnvDefaults,
+		"%s/%s: failed setting environment defaults",
+		common.AppName, pkg)
 
-	errNotOnFly = exit.Wrap(common.ECNotOnFly,
-		errors.New(errorPrefix+"not running on fly"))
+	errNotOnFly = exit.Wrapf(common.ECNotOnFly,
+		"%s/%s: not running on fly",
+		common.AppName, pkg)
 
-	errLoadConfig = exit.Wrap(common.ECConfig,
-		errors.New(errorPrefix+"failed loading configuration"))
+	errLoadConfig = exit.Wrapf(common.ECConfig,
+		"%s/%s: failed loading configuration",
+		common.AppName, pkg)
 )
 
 // Load loads the configuration from the environment.
