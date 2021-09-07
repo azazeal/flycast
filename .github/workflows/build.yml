@@ -37,9 +37,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Run tests
       run: |
-        COVERPKG=$(go list ./... | tr '\n' ,)
-        COVERPKG=${COVERPKG%?}
-        go test -race -coverpkg=${COVERPKG} -coverprofile=coverage.out -covermode=atomic ./...
+        go test -race -coverpkg=./... -coverprofile=coverage.out -covermode=atomic ./...
     - name: Upload coverage report
       if: ${{ hashFiles('coverage.out') != '' }}
       uses: shogo82148/actions-goveralls@v1
