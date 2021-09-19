@@ -82,7 +82,7 @@ func serve(parent context.Context, logger *zap.Logger, l net.Listener, h http.Ha
 
 		select {
 		case <-parent.Done():
-			ctx, cancel := context.WithTimeout(context.TODO(), time.Minute>>1)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Minute>>1)
 			defer cancel()
 
 			_ = srv.Shutdown(ctx)
@@ -161,7 +161,7 @@ func broadcast(w http.ResponseWriter, r *http.Request) {
 		With(log.Data(wrapper.Body)).
 		With(zap.Bool("globally", wrapper.Globally))
 
-	// TODO: implement
+	// TODO: implement via implementing a broadcast.Broadcaster struct
 
 	respondWith(w, http.StatusNoContent)
 }
@@ -192,8 +192,8 @@ func newMux(ctx context.Context) (mux *http.ServeMux) {
 
 	hc := health.FromContext(ctx)
 	match("/health", hc, http.MethodGet, http.MethodHead)
-
-	matchFunc("/broadcast", broadcast, http.MethodPost)
+	// TODO: re-enable once HTTP broadcasting is implemented
+	// matchFunc("/broadcast", broadcast, http.MethodPost)
 	matchFunc("/", index, http.MethodGet)
 
 	return

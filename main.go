@@ -23,7 +23,7 @@ func main() {
 
 func run() (err error) {
 	var ctx context.Context
-	if ctx, err = newContext(context.TODO()); err != nil {
+	if ctx, err = newContext(context.Background()); err != nil {
 		return
 	}
 
