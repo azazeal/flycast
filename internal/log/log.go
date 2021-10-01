@@ -14,20 +14,18 @@ import (
 	"github.com/azazeal/flycast/internal/common"
 )
 
-type contextKeyType int
-
-const contextKey contextKeyType = iota + 1
+type contextKeyType struct{}
 
 // FromContext returns the Logger the given Context carries.
 //
 // FromContext panics in case the given Context carries no Logger.
 func FromContext(ctx context.Context) *zap.Logger {
-	return ctx.Value(contextKey).(*zap.Logger)
+	return ctx.Value(contextKeyType{}).(*zap.Logger)
 }
 
 // NewContext returns a copy of ctx which carries logger.
 func NewContext(ctx context.Context, logger *zap.Logger) context.Context {
-	return context.WithValue(ctx, contextKey, logger)
+	return context.WithValue(ctx, contextKeyType{}, logger)
 }
 
 const stampLayout = "2006-01-02 15:04:05.000"
