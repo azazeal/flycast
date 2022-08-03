@@ -89,22 +89,22 @@ func (l *List) refresh(ctx context.Context) {
 	}
 	l.hc.Pass(l.hcc)
 
-	var new peerSet
+	var newSet peerSet
 	if len(ips) > 0 {
-		new = make(peerSet, len(ips))
+		newSet = make(peerSet, len(ips))
 	}
 
 	for _, ip := range ips {
-		new.add(ip, l.port)
+		newSet.add(ip, l.port)
 	}
 
 	// swap sets
 	l.mu.Lock()
-	old := l.ps
-	l.ps = new
+	oldSet := l.ps
+	l.ps = newSet
 	l.mu.Unlock()
 
-	old.empty()
+	oldSet.empty()
 
 	l.logger.Debug("resolved instances.",
 		zap.Int("instances", len(ips)),
