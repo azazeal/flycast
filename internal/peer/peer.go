@@ -2,6 +2,7 @@ package peer
 
 import (
 	"context"
+	"errors"
 	"net"
 	"sync"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"github.com/azazeal/health"
 	"go.uber.org/zap"
 
-	"github.com/azazeal/flycast/internal/buffer"
 	"github.com/azazeal/flycast/internal/config"
 	"github.com/azazeal/flycast/internal/log"
 	"github.com/azazeal/flycast/internal/loop"
@@ -113,9 +113,6 @@ func (l *List) refresh(ctx context.Context) {
 
 // Broadcast relays the message to all of the peers in l via conn.
 func (l *List) Broadcast(conn net.PacketConn, msg []byte) {
-	buf := buffer.Dup(msg)
-	defer buffer.Put(buf)
-
 	var wg sync.WaitGroup
 	defer wg.Wait()
 
@@ -186,6 +183,6 @@ var addrPool = sync.Pool{
 }
 
 func isNXDomain(err error) bool {
-	e, ok := err.(*net.DNSError)
-	return ok && e.IsNotFound
+	var w *net.DNSError
+	return errors.As(err, &w) && w.IsNotFound
 }

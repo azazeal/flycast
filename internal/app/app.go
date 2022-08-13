@@ -4,7 +4,6 @@ package app
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	golog "log"
@@ -141,38 +140,13 @@ type indexViewData struct {
 	Failures []string
 }
 
-func broadcast(w http.ResponseWriter, r *http.Request) {
-	logger := log.FromContext(r.Context())
-
-	var wrapper struct {
-		Globally bool   `json:"globally"`
-		Body     []byte `json:"data"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&wrapper); err != nil {
-		logger.Warn("failed decoding message.",
-			zap.Error(err))
-
-		respondWith(w, http.StatusUnprocessableEntity)
-
-		return
-	}
-
-	logger = logger.
-		With(log.Data(wrapper.Body)).
-		With(zap.Bool("globally", wrapper.Globally))
-
-	// TODO: implement via implementing a broadcast.Broadcaster struct
-
-	respondWith(w, http.StatusNoContent)
-}
-
 func index(w http.ResponseWriter, r *http.Request) {
 	hc := health.FromContext(r.Context())
 
 	failures := hc.Failing(nil)
 	sort.Strings(failures)
 
-	indexTemplate.Execute(w, indexViewData{
+	_ = indexTemplate.Execute(w, indexViewData{
 		AppName:  common.AppName,
 		Region:   env.Region(),
 		Failures: failures,
@@ -197,14 +171,6 @@ func newMux(ctx context.Context) (mux *http.ServeMux) {
 	matchFunc("/", index, http.MethodGet)
 
 	return
-}
-
-func matchFunc(m *http.ServeMux, fn http.HandlerFunc, path string, methods ...string) {
-	m.Handle(path, restrict(fn, path, methods...))
-}
-
-func match(m *http.ServeMux, h http.Handler, path string, methods ...string) {
-	m.Handle(path, restrict(h, path, methods...))
 }
 
 func restrict(h http.Handler, path string, methods ...string) http.Handler {
