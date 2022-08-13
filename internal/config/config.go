@@ -70,10 +70,6 @@ func NewContext(ctx context.Context, cfg *Config) context.Context {
 const pkg = "config"
 
 var (
-	errSetDefaults = exit.Wrapf(common.ECSetEnvDefaults,
-		"%s/%s: failed setting environment defaults",
-		common.AppName, pkg)
-
 	errNotOnFly = exit.Wrapf(common.ECNotOnFly,
 		"%s/%s: not running on fly",
 		common.AppName, pkg)

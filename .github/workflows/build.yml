@@ -11,35 +11,52 @@ on:
       - opened
       - synchronize
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Run linter
-        uses: docker://morphy/revive-action:v2
+      - name: Setup Go
+        uses: actions/setup-go@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Configure Linter
+        run: |
+          curl -O https://raw.githubusercontent.com/azazeal/workflows/master/.golangci.yml
+      - name: Run Linter
+        uses: golangci/golangci-lint-action@v3
         with:
-          config: "./revive.toml"
-          path: "./..."
+          version: v1.48
 
   test:
     name: Test
     needs: lint
     runs-on: ubuntu-latest
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v2
+    - name: Setup Go
+      uses: actions/setup-go@v3
       with:
         go-version: '1.18'
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Run tests
+    - name: Install gotestsum
       run: |
-        go test -race -coverpkg=./... -coverprofile=coverage.out -covermode=atomic ./...
-    - name: Upload coverage report
-      if: ${{ hashFiles('coverage.out') != '' }}
+        go install gotest.tools/gotestsum@v1.8.1
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Run Test Suite
+      run: |
+        gotestsum -- -race -coverpkg=./... -coverprofile=coverprofile -covermode=atomic ./...
+      env:
+        GOTESTSUM_JSONFILE: gotestsum.json
+    - name: Annotate Test Suite Results
+      if: always()
+      uses: guyarb/golang-test-annotations@v0.5.1
+      with:
+        test-results: gotestsum.json
+    - name: Start Uploading Coverage Report
       uses: shogo82148/actions-goveralls@v1
       with:
-        path-to-profile: coverage.out
+        path-to-profile: coverprofile

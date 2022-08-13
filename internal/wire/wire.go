@@ -3,6 +3,7 @@ package wire
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"sync"
@@ -33,9 +34,6 @@ func Broadcast(ctx context.Context, wg *sync.WaitGroup, pl *peer.List, global bo
 		hcc = region.WireComponent(global)
 	)
 
-	buf := buffer.Get()
-	defer buffer.Put(buf)
-
 	go func() {
 		defer wg.Done()
 
@@ -47,6 +45,9 @@ func Broadcast(ctx context.Context, wg *sync.WaitGroup, pl *peer.List, global bo
 				return
 			}
 			hc.Pass(hcc)
+
+			buf := buffer.Get()
+			defer buffer.Put(buf)
 
 			run(ctx, &broadcaster{
 				logger: logger,
@@ -86,7 +87,7 @@ type broadcaster struct {
 	logger *zap.Logger
 	conn   net.PacketConn
 	pl     *peer.List
-	buf    []byte
+	buf    *buffer.Buffer
 }
 
 func run(ctx context.Context, b *broadcaster) {
@@ -114,7 +115,7 @@ func run(ctx context.Context, b *broadcaster) {
 
 	for {
 		msg, err := b.read()
-		if err != nil && !canRecoverFrom(err) {
+		if err != nil && !isTimeout(err) {
 			return // terminal error
 		}
 		if len(msg) == 0 {
@@ -161,8 +162,7 @@ func (b *broadcaster) read() ([]byte, error) {
 	return b.buf[:n], err
 }
 
-func canRecoverFrom(err error) bool {
-	te, ok := err.(net.Error)
-
-	return ok && (te.Temporary() || te.Timeout())
+func isTimeout(err error) bool {
+	var ne net.Error
+	return errors.As(err, &ne) && ne.Timeout()
 }

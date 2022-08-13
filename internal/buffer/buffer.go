@@ -5,28 +5,20 @@ import "sync"
 // Size denotes the size of all buffers.
 const Size = 1 << 14
 
-// Dup returns a buffer which contains a copy of msg.
-//
-// the buffer may be released to the pool.
-func Dup(msg []byte) (buf []byte) {
-	buf = Get()
-	copy(buf[:len(msg):Size], msg)
-
-	return
-}
+type Buffer [Size]byte
 
 // Get returns an available packet buffer.
-func Get() []byte {
-	return pool.Get().([]byte)
+func Get() *Buffer {
+	return pool.Get().(*Buffer)
 }
 
 // Put releases the buffer
-func Put(b []byte) {
-	pool.Put(b[:Size:Size])
+func Put(b *Buffer) {
+	pool.Put(b)
 }
 
 var pool = sync.Pool{
 	New: func() interface{} {
-		return make([]byte, Size, Size)
+		return new(Buffer)
 	},
 }
