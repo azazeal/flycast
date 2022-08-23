@@ -1,7 +1,11 @@
 package buffer
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestFail(t *testing.T) {
-	t.Fatal("failed")
+	assert.True(t, false)
 }
